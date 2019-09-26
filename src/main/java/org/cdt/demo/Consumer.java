@@ -9,7 +9,7 @@ public class Consumer {
         DemoService demoService = (DemoService) context.getBean("demoServiceConsumer"); // 获取远程服务代理
         while (true) {
             try {
-                String hello = demoService.sayHello("world cdt"); // 执行远程方法
+                String hello = demoService.sayHello(1); // 执行远程方法
                 System.out.println(hello); // 显示调用结果
             } catch (Exception e) {
                 e.printStackTrace();
@@ -19,4 +19,5 @@ public class Consumer {
 
         }
     }
+
 }
