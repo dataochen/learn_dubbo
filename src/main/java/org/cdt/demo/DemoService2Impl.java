@@ -2,12 +2,19 @@ package org.cdt.demo;
 
 import com.alibaba.dubbo.config.annotation.Service;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 @Service
-//@Component
 public class DemoService2Impl implements DemoService {
     @Override
     public String sayHello(String name) {
-        return "Hello222 " + name;
+        try {
+            String ip = InetAddress.getLocalHost().getHostAddress();
+            return "ip: " + ip + " Hello2" + name;
+        } catch (UnknownHostException e) {
+            return "UnknownHostException Hello2";
+        }
     }
 
     @Override

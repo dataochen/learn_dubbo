@@ -1,8 +1,8 @@
 package org.cdt.demo;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -15,20 +15,27 @@ import javax.annotation.PostConstruct;
 @Component
 public class ConsumerSpring {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerSpring.class);
-    @Autowired
+    @Reference(check = false)
     private DemoService demoServiceConsumer;
 
     @PostConstruct
     public void ee() throws Exception {
         LOGGER.info("====cdt ee start");
-        while (true) {
-            Thread.sleep(3000);
-            try {
-                exe();
-            } catch (Exception e) {
-                LOGGER.error(" afterPropertiesSet e={}", e);
+        new Thread(() -> {
+
+            while (true) {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    exe();
+                } catch (Exception e) {
+                    LOGGER.error(" afterPropertiesSet e={}", e);
+                }
             }
-        }
+        }).start();
 
     }
 
