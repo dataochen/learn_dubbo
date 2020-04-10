@@ -6,7 +6,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @Service
-public class DemoService2Impl implements DemoService {
+public class DemoService2Impl implements DemoService,Cloneable  {
     @Override
     public String sayHello(String name) {
         try {
@@ -15,6 +15,16 @@ public class DemoService2Impl implements DemoService {
         } catch (UnknownHostException e) {
             return "UnknownHostException Hello2";
         }
+    }
+
+    private String s;
+
+    public String getS() {
+        return s;
+    }
+
+    public void setS(String s) {
+        this.s = s;
     }
 
     @Override
@@ -26,4 +36,10 @@ public class DemoService2Impl implements DemoService {
     public String sayHello2(Integer name) {
         return null;
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
 }
