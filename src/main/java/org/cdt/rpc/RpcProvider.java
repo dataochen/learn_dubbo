@@ -15,8 +15,10 @@ package org.cdt.rpc;
 public class RpcProvider {  
   
     public static void main(String[] args) throws Exception {  
-        HelloService service = new HelloServiceImpl();  
+        HelloService service = new HelloServiceImpl();
+        TestServiceImp testServiceImp = new TestServiceImp();
         RpcFramework.export(service, 1234);  
-    }  
+        RpcFramework.export(testServiceImp, 1234);
+    }
   
 }  
