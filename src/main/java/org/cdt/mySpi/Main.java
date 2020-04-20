@@ -21,6 +21,10 @@ public class Main {
         } catch (InstantiationException e) {
             e.printStackTrace();
         }
+//        ServiceLoader<TestInterface> load = ServiceLoader.load(TestInterface.class);
+//        for (TestInterface testInterface : load) {
+//            testInterface.say("jdk");
+//        }
     }
 
     public static void loadAll() throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
