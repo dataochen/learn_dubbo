@@ -12,19 +12,28 @@ public class  Test {
     private String c;
 
     public static void main(String[] args) throws IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
-        while (true) {
-            System.out.println("kais");
-            for (int i = 0; i < 19; i++) {
-                System.out.println(i);
-                if (i == 1) {
-                    break ;
-                }
-            }
+        int i = System.identityHashCode(new Test());
+        int i2 = System.identityHashCode(new Test());
+        System.out.println(i);
+        System.out.println(i2);
+        MyThread myThread = new MyThread();
+        myThread.setDaemon(true);
+        myThread.run();
+        try {
+            Thread.sleep(2000);
+            System.out.println(myThread.isAlive());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
-    public <T>  T cc(T cc) {
-        String[] strings = new String[3];
-        return null;
-    }
+ static class  MyThread extends Thread{
+
+
+     @Override
+     public void run() {
+         System.out.println(1);
+     }
+ }
+
 }
