@@ -84,7 +84,7 @@ public class RpcFrameWork {
      * @param <T>
      * @return
      */
-    public static <T> T refer(Class<T> interfaces, String address, int port) throws IOException {
+    public static <T> T refer(Class<? extends T> interfaces, String address, int port) throws IOException {
         if (Objects.isNull(interfaces)) {
             throw new IllegalArgumentException("interfaces is null");
         }
