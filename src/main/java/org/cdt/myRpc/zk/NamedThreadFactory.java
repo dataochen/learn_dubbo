@@ -19,7 +19,7 @@ public class NamedThreadFactory implements ThreadFactory {
     @Override
     public Thread newThread(Runnable r) {
         String name = prefix + mThreadNum.getAndIncrement();
-        Thread thread = new Thread(name);
+        Thread thread = new Thread(r,name);
         return thread;
     }
 }

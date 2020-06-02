@@ -4,7 +4,6 @@ import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.IZkStateListener;
 import org.I0Itec.zkclient.ZkClient;
-import org.I0Itec.zkclient.exception.ZkNoNodeException;
 import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.I0Itec.zkclient.serialize.SerializableSerializer;
 import org.apache.zookeeper.Watcher;
@@ -25,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DirectoryZk {
     private volatile ZkClient zkClient;
     private volatile static DirectoryZk directoryZk;
-    private static final String APIS_PROVIDES_PATH_SUFFIX = "/MyRpc/apis/provides/";
-    private static final String APIS_CONSUMES_PATH_SUFFIX = "/MyRpc/apis/consumes/";
+    private static final String APIS_PROVIDES_PATH_SUFFIX = "/MyRpc/apis/provides";
+    private static final String APIS_CONSUMES_PATH_SUFFIX = "/MyRpc/apis/consumes";
     /**
      * 本地缓存的invoker
      * Key:接口全限名
@@ -44,6 +43,20 @@ public class DirectoryZk {
         }
     }
 
+    /**
+     * 初始化路径
+     */
+    private void initPath() {
+        boolean exists = zkClient.exists(APIS_PROVIDES_PATH_SUFFIX);
+        if (!exists) {
+            zkClient.createPersistent(APIS_PROVIDES_PATH_SUFFIX, true);
+        }
+        boolean exists1 = zkClient.exists(APIS_CONSUMES_PATH_SUFFIX);
+        if (!exists1) {
+            zkClient.createPersistent(APIS_CONSUMES_PATH_SUFFIX, true);
+        }
+    }
+
     public void destroy() {
         zkClient.close();
     }
@@ -53,6 +66,7 @@ public class DirectoryZk {
 
     private DirectoryZk(String address) {
         init(address);
+        initPath();
     }
 
     public static DirectoryZk getInstance(String address) {
@@ -67,24 +81,34 @@ public class DirectoryZk {
     }
 
     public void addNode(String path, Object data) {
-        zkClient.createPersistent(path, true);
-//        createEphemeralParent(path);
+//        zkClient.createPersistent(path, true);
+        try {
+            zkClient.createEphemeral(path, true);
+        } catch (ZkNodeExistsException e) {
+//            临时节点在断开连接时不是立即删除的
+            boolean exists = zkClient.exists(path);
+            if (!exists) {
+                addNode(path, data);
+            } else {
+                throw e;
+            }
+        }
         zkClient.writeData(path, data);
         zkClient.subscribeChildChanges(path, new InnerPathsLister());
 
     }
-
-    private void createEphemeralParent(String path) {
-        try {
-            zkClient.createEphemeral(path);
-        } catch (ZkNodeExistsException e) {
-        } catch (ZkNoNodeException e) {
-            String parentDir = path.substring(0, path.lastIndexOf('/'));
-            createEphemeralParent(parentDir);
-            createEphemeralParent(path);
-
-        }
-    }
+//
+//    private void createEphemeralParent(String path) {
+//        try {
+//            zkClient.createEphemeral(path);
+//        } catch (ZkNodeExistsException e) {
+//        } catch (ZkNoNodeException e) {
+//            String parentDir = path.substring(0, path.lastIndexOf('/'));
+//            createEphemeralParent(parentDir);
+//            createEphemeralParent(path);
+//
+//        }
+//    }
 
     public void deleteNode(String path) {
         boolean b = zkClient.deleteRecursive(path);
@@ -165,8 +189,8 @@ public class DirectoryZk {
     public List<Invoker> getInvokeList(Class interfaces) throws IllegalAccessException {
         String name = interfaces.getName();
 //        全限名 点 转换为 路径
-        String intefacePath = APIS_PROVIDES_PATH_SUFFIX + name.replaceAll("\\.", "/");
-        String intefacePathConsume = APIS_CONSUMES_PATH_SUFFIX + name.replaceAll("\\.", "/");
+        String intefacePath = APIS_PROVIDES_PATH_SUFFIX +"/"+ name;
+        String intefacePathConsume = APIS_CONSUMES_PATH_SUFFIX +"/"+ name;
         //     * 1.获取servers
         Object data4Path1 = getData4Path(intefacePath);
         if (null == data4Path1) {
