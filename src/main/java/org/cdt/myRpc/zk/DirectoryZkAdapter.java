@@ -18,6 +18,9 @@ import java.util.concurrent.TimeUnit;
  * @Description zk数据模型：
  * /MyRpc/apis/xx
  * 接口全限名：ip1,ip2
+ * 1.支持分布式调用
+ * 2.支持多接口发布
+ *
  * @date: 2020/5/28 17:43
  */
 public class DirectoryZkAdapter {
