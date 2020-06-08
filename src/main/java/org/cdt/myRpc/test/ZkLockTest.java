@@ -80,7 +80,7 @@ public class ZkLockTest {
                 try {
                     ZkLock.SequentialLock sequentialLockInstance = ZkLock.getSequentialLockInstance("127.0.0.1");
                     countDownLatch.await();
-                    sequentialLockInstance.tryLock();
+                    sequentialLockInstance.tryLock(5000L);
                     TimeUnit.SECONDS.sleep(5);
                     sequentialLockInstance.unLock();
                 } catch (Exception e) {

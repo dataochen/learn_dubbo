@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author dataochen
@@ -107,11 +108,10 @@ public class ZkLock {
         }
 
         /**
-         * 暂不支持超时设置
-         *
+         *timeOut 单位 毫秒
          * @throws InterruptedException
          */
-        public void tryLock() {
+        public void tryLock(Long timeOut) {
 
             ephemeralSequential = zkClient.createEphemeralSequential(PATH + "/LOCK", new byte[0]);
             System.out.println(Thread.currentThread().getName() + "->创建节点：" + ephemeralSequential);
@@ -121,11 +121,11 @@ public class ZkLock {
 //            if (endTime - startTime >= timeOut) {
 //                throw new RuntimeException("timeOut time:" + timeOut);
 //            }
-            SequentialLock.this.lock();
+            SequentialLock.this.lock(timeOut);
 
         }
 
-        private boolean lock() {
+        private boolean lock(Long timeOut) {
             String substring = ephemeralSequential.substring(8);
             List<String> children = zkClient.getChildren(PATH);
             children.sort(Comparator.naturalOrder());
@@ -154,7 +154,11 @@ public class ZkLock {
             zkClient.subscribeChildChanges(path, iZkChildListener);
             //            异步计时器 超时解除countDownLatch todo
             try {
-                countDownLatch.await();
+                boolean await = countDownLatch.await(timeOut, TimeUnit.MILLISECONDS);
+                if (!await) {
+                    System.out.println("超时 timeOut="+timeOut);
+                    return await;
+                }
             } catch (InterruptedException e) {
                 return false;
             }
