@@ -29,6 +29,12 @@ public class DemoService2Impl implements DemoService,Cloneable  {
 
     @Override
     public String sayHello(Integer name) {
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return "sayhello interger";
     }
 
